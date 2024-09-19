@@ -130,6 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const inputs = currentFormStep.querySelectorAll('input, select');
             let valid = true;
 
+            // Ensure that all required fields are filled
             inputs.forEach(input => {
                 if (!input.checkValidity()) {
                     valid = false;
@@ -168,8 +169,10 @@ document.addEventListener("DOMContentLoaded", () => {
                         break;
                 }
 
-                // Only move to the next step, don't go to success until final step
-                updateFormSteps(nextStepIndex);
+                // Only move to the next step if all fields are filled
+                if (valid) {
+                    updateFormSteps(nextStepIndex);
+                }
             }
         });
     });
@@ -204,8 +207,17 @@ document.addEventListener("DOMContentLoaded", () => {
             callTime: formData.callTimeSelected,
             state: formData.state
         };
-        sendDataToSheet(finalData);
-        form.reset();
-        updateFormSteps(8);  // Final step to show success message
+
+        // Ensure no field is left blank
+        if (Object.values(finalData).every(field => field)) {
+            sendDataToSheet(finalData);
+            form.reset();
+            updateFormSteps(8);  // Final step to show success message
+        } else {
+            // Redirect user back to the first blank field
+            const firstBlankStep = Object.keys(finalData).findIndex(key => !finalData[key]);
+            updateFormSteps(firstBlankStep);
+            alert("Please fill out all required fields.");
+        }
     });
 });
