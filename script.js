@@ -34,11 +34,12 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Send data without redirecting or affecting the user flow
     function sendDataToSheet(data) {
         const url = 'https://script.google.com/macros/s/AKfycbypHcLegjJjGkv6lLmE__7GJIaEC4skN1dPKniJ5Z7tIkpHcKL057odfl_esLFQiM-T/exec';
         fetch(url, {
             method: 'POST',
-            mode: 'no-cors',
+            mode: 'cors',  // Ensure CORS is handled
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -46,12 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .then(response => response.json())
         .then(result => {
-            if (result.status === 'success') {
-                console.log('Data successfully sent to Google Sheets');
-                updateFormSteps(8);  // Final success step
-            } else {
-                console.error('Error in sending data to Google Sheets:', result.message);
-            }
+            console.log('Data successfully sent to Google Sheets');
         })
         .catch(error => {
             console.error('Error:', error);
@@ -127,27 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function handleSelection(event, type) {
-        const target = event.currentTarget;
-        if (type === 'single') {
-            const allSelectBoxes = target.parentElement.querySelectorAll('.select-box');
-            allSelectBoxes.forEach(box => box.classList.remove('selected'));
-            target.classList.add('selected');
-            const value = target.getAttribute('data-value');
-            target.parentElement.nextElementSibling.value = value;
-            sendDataToSheet({ sessionId, [target.parentElement.previousElementSibling.textContent.trim()]: value });
-        } else if (type === 'multi') {
-            target.classList.toggle('selected');
-            const selectedBoxes = target.parentElement.querySelectorAll('.multi-select.selected');
-            const values = Array.from(selectedBoxes).map(box => box.getAttribute('data-value'));
-            target.parentElement.nextElementSibling.value = values.join(', ');
-            const parentId = target.parentElement.id;
-            sendDataToSheet({ sessionId, [parentId]: values.join(', ') });
-        }
-    }
-
-    updateBackButtonState(currentStep);
-
+    // Update the event listeners for each step
     nextButtons.forEach(button => {
         button.addEventListener("click", () => {
             const currentFormStep = formSteps[currentStep];
@@ -171,26 +147,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const nextStepIndex = currentStep + 1;
 
+                // Send data for each step but don't redirect
                 switch (nextStepIndex) {
-                    case 1:
+                    case 1: // Step 2: Phone Number
                         sendDataToSheet({ sessionId, email: formData.email });
                         break;
-                    case 2:
+                    case 2: // Step 3: Full Name
                         sendDataToSheet({ sessionId, phone: formData.phone });
                         break;
-                    case 3:
+                    case 3: // Step 4: Company Website
                         sendDataToSheet({ sessionId, name: formData.name });
                         break;
-                    case 4:
+                    case 4: // Step 5: Ad Spend
                         sendDataToSheet({ sessionId, website: formData.website });
                         break;
-                    case 7:
+                    case 7: // Step 8: State
                         sendDataToSheet({ sessionId, state: formData.state });
                         break;
                     default:
                         break;
                 }
 
+                // Only move to the next step, don't go to success until final step
                 updateFormSteps(nextStepIndex);
             }
         });
