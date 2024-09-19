@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Multi-Step Form</title>
+  <!-- Google Fonts: Open Sans for headings and labels, Inter for body and inputs -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Link to the final styles.css -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="form-wrapper">
+    <!-- Back Button and Progress Bar Container -->
+    <div class="progress-container">
+      <button type="button" class="back-btn" id="back-btn" disabled aria-label="Go Back">
+        <!-- SVG Icon for Back Button -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#3b82f6" viewBox="0 0 24 24">
+          <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+        </svg>
+      </button>
+      <div class="progress-bar">
+        <div class="progress"></div>
+      </div>
+    </div>
+
+    <!-- Form Header -->
+    <h1>Struggling to convert<br> ad clicks <span>into leads? 😢</span></h1>
+    <p>We can help. Just answer a few questions.</p>
+
+    <!-- Multi-Step Form -->
+    <form id="lead-form">
+      <!-- Step 1: Email -->
+      <div class="form-step active" data-step="1">
+        <label for="email">Work Email? <span>*</span></label>
+        <input type="email" id="email" name="email" placeholder="johndoe@example.com" required>
+        <button type="button" class="next-btn">Next</button>
+      </div>
+
+      <!-- Step 2: Phone Number -->
+      <div class="form-step" data-step="2">
+        <input type="tel" id="phone" name="phone" placeholder="123-456-7890" required pattern="^\+?(\d{1,4})?[-.\s]?(\(?\d{1,4}\)?)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$
+">
+        <button type="button" class="next-btn">Next</button>
+      </div>
+
+      <!-- Step 3: Full Name -->
+      <div class="form-step" data-step="3">
+        <input type="text" id="name" name="name" placeholder="John Doe" required>
+        <button type="button" class="next-btn">Next</button>
+      </div>
+
+      <!-- Step 4: Company Website -->
+      <div class="form-step" data-step="4">
+        <input type="text" id="website" name="website" pattern="^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/\S*)?$" placeholder="example.com">
+
+        <button type="button" class="next-btn">Next</button>
+      </div>
+
+      <!-- Step 5: Ad Spend -->
+      <div class="form-step" data-step="5">
+        <div class="select-grid">
+          <div class="select-box" data-value="None">🚫 None</div>
+          <div class="select-box" data-value="$0-$5K">💵 $0-$5K</div>
+          <div class="select-box" data-value="$5K-$10K">💸 $5K-$10K</div>
+          <div class="select-box" data-value="$10K+">💰 $10K+</div>
+        </div>
+        <input type="hidden" id="adSpend" name="adSpend" required>
+        <button type="button" class="next-btn">Next</button>
+      </div>
+
+      <!-- Step 6: Best Day to Call -->
+      <div class="form-step" data-step="6">
+        <div class="select-grid" id="callDay">
+          <div class="multi-select" data-value="Monday">🗓️ Monday</div>
+          <div class="multi-select" data-value="Tuesday">🗓️ Tuesday</div>
+          <div class="multi-select" data-value="Wednesday">🗓️ Wednesday</div>
+          <div class="multi-select" data-value="Thursday">🗓️ Thursday</div>
+          <div class="multi-select" data-value="Friday">🗓️ Friday</div>
+          <div class="multi-select" data-value="Saturday">🗓️ Saturday</div>
+          <div class="multi-select" data-value="Sunday">🗓️ Sunday</div>
+        </div>
+        <input type="hidden" id="callDaySelected" name="callDaySelected" required>
+        <button type="button" class="next-btn">Next</button>
+      </div>
+
+      <!-- Step 7: Best Time to Call -->
+      <div class="form-step" data-step="7">
+        <div class="select-grid" id="callTime">
+          <div class="multi-select" data-value="Morning">🌅 Morning</div>
+          <div class="multi-select" data-value="Afternoon">🌤️ Afternoon</div>
+          <div class="multi-select" data-value="Evening">🌙 Evening</div>
+        </div>
+        <input type="hidden" id="callTimeSelected" name="callTimeSelected" required>
+        <button type="button" class="next-btn">Next</button>
+      </div>
+
+      <!-- Step 8: State -->
+      <div class="form-step" data-step="8">
+        <select id="state" name="state" required>
+          <!-- List of US States -->
+          <option value="AL">Alabama</option>
+          <option value="AK">Alaska</option>
+          <option value="AZ">Arizona</option>
+          <option value="AR">Arkansas</option>
+          <option value="CA">California</option>
+          <option value="CO">Colorado</option>
+          <option value="CT">Connecticut</option>
+          <option value="DE">Delaware</option>
+          <option value="FL">Florida</option>
+          <option value="GA">Georgia</option>
+          <option value="HI">Hawaii</option>
+          <option value="ID">Idaho</option>
+          <option value="IL">Illinois</option>
+          <option value="IN">Indiana</option>
+          <option value="IA">Iowa</option>
+          <option value="KS">Kansas</option>
+          <option value="KY">Kentucky</option>
+          <option value="LA">Louisiana</option>
+          <option value="ME">Maine</option>
+          <option value="MD">Maryland</option>
+          <option value="MA">Massachusetts</option>
+          <option value="MI">Michigan</option>
+          <option value="MN">Minnesota</option>
+          <option value="MS">Mississippi</option>
+          <option value="MO">Missouri</option>
+          <option value="MT">Montana</option>
+          <option value="NE">Nebraska</option>
+          <option value="NV">Nevada</option>
+          <option value="NH">New Hampshire</option>
+          <option value="NJ">New Jersey</option>
+          <option value="NM">New Mexico</option>
+          <option value="NY">New York</option>
+          <option value="NC">North Carolina</option>
+          <option value="ND">North Dakota</option>
+          <option value="OH">Ohio</option>
+          <option value="OK">Oklahoma</option>
+          <option value="OR">Oregon</option>
+          <option value="PA">Pennsylvania</option>
+          <option value="RI">Rhode Island</option>
+          <option value="SC">South Carolina</option>
+          <option value="SD">South Dakota</option>
+          <option value="TN">Tennessee</option>
+          <option value="TX">Texas</option>
+          <option value="UT">Utah</option>
+          <option value="VT">Vermont</option>
+          <option value="VA">Virginia</option>
+          <option value="WA">Washington</option>
+          <option value="WV">West Virginia</option>
+          <option value="WI">Wisconsin</option>
+          <option value="WY">Wyoming</option>
+        </select>
+        <button type="submit">Submit</button>
+      </div>
+      <!-- Step 9: Success Message -->
+      <div class="form-step" data-step="9">
+        <div class="success-container">
+          <!-- Animated Green Checkmark -->
+          <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+            <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+          </svg>
+          <!-- Success Message -->
+          <h2>Your form submission was successful!</h2>
+          <p>Thank you for getting in touch. We'll reach out to you shortly.</p>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Link to the final script.js -->
+  <script src="script.js"></script>
+</body>
+
+</html>
