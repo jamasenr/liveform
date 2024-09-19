@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const url = 'https://script.google.com/macros/s/AKfycbypHcLegjJjGkv6lLmE__7GJIaEC4skN1dPKniJ5Z7tIkpHcKL057odfl_esLFQiM-T/exec';
         fetch(url, {
             method: 'POST',
-            mode: 'cors',  // Ensure CORS is handled
+            mode: 'no-cors',  // Ensure CORS is handled
             headers: {
                 'Content-Type': 'application/json'
             },
