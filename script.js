@@ -177,15 +177,42 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // Event listener for single select (Step 5: Ad Spend)
     const selectBoxes = document.querySelectorAll('.select-box');
     selectBoxes.forEach(box => {
-        box.addEventListener('click', (e) => handleSelection(e, 'single'));
+        box.addEventListener('click', (e) => {
+            handleSelection(e, 'single');
+        });
     });
 
+    // Event listener for multi select (Step 6 & 7: Best Day and Best Time to Call)
     const multiSelectBoxes = document.querySelectorAll('.multi-select');
     multiSelectBoxes.forEach(box => {
-        box.addEventListener('click', (e) => handleSelection(e, 'multi'));
+        box.addEventListener('click', (e) => {
+            handleSelection(e, 'multi');
+        });
     });
+
+    function handleSelection(event, type) {
+        const target = event.currentTarget;
+        if (type === 'single') {
+            // For single-select boxes like Ad Spend
+            const allSelectBoxes = target.parentElement.querySelectorAll('.select-box');
+            allSelectBoxes.forEach(box => box.classList.remove('selected'));
+            target.classList.add('selected');
+            const value = target.getAttribute('data-value');
+            target.parentElement.nextElementSibling.value = value;
+            sendDataToSheet({ sessionId, [target.parentElement.previousElementSibling.textContent.trim()]: value });
+        } else if (type === 'multi') {
+            // For multi-select boxes like Best Day and Time
+            target.classList.toggle('selected');
+            const selectedBoxes = target.parentElement.querySelectorAll('.multi-select.selected');
+            const values = Array.from(selectedBoxes).map(box => box.getAttribute('data-value'));
+            target.parentElement.nextElementSibling.value = values.join(', ');
+            const parentId = target.parentElement.id;
+            sendDataToSheet({ sessionId, [parentId]: values.join(', ') });
+        }
+    }
 
     backBtn.addEventListener("click", () => {
         if (currentStep > 0) {
