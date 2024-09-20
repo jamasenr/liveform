@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const p = document.querySelector("p");
 
     const stepTitles = [
-        "Struggling to convert<br> ad clicks <span>into leads? 😢</span>", // Step 1
+        "Looking for experts <br> to run Meta and Google ads?", // Step 1
         "Phone Number?", // Step 2
         "Full Name?", // Step 3
         "Company Website?", // Step 4
