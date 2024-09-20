@@ -268,6 +268,3 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-console.log('Selected Ad Spend:', value);
-console.log('Hidden input value:', target.parentElement.nextElementSibling.value);
-
