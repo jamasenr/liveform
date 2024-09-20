@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Get the value from the selected box's data-value attribute
         const value = target.getAttribute('data-value');
-
+        alert('Selected Value: ' + value);
         // Update the hidden input field with the selected value
         target.parentElement.nextElementSibling.value = value;
 
