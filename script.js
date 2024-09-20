@@ -34,12 +34,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Send data without redirecting or affecting the user flow
     function sendDataToSheet(data) {
         const url = 'https://script.google.com/macros/s/AKfycbypHcLegjJjGkv6lLmE__7GJIaEC4skN1dPKniJ5Z7tIkpHcKL057odfl_esLFQiM-T/exec';
         fetch(url, {
             method: 'POST',
-            mode: 'no-cors',  // Ensure CORS is handled
+            mode: 'no-cors',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -47,43 +46,16 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .then(response => response.json())
         .then(result => {
-            console.log('Data successfully sent to Google Sheets');
+            if (result.status === 'success') {
+                console.log('Data successfully sent to Google Sheets');
+                updateFormSteps(8);  // Final success step
+            } else {
+                console.error('Error in sending data to Google Sheets:', result.message);
+            }
         })
         .catch(error => {
             console.error('Error:', error);
         });
-    }
-
-    // Define the handleSelection function that handles single and multi-select clicks
-    
-function handleSelection(event, type) {
-    const target = event.currentTarget;
-    if (type === 'single') {
-        // Deselect all other select boxes
-        const allSelectBoxes = target.parentElement.querySelectorAll('.select-box');
-        allSelectBoxes.forEach(box => box.classList.remove('selected'));
-
-        // Mark the clicked one as selected
-        target.classList.add('selected');
-
-        // Get the value of the selected option
-        const value = target.getAttribute('data-value');
-
-        // Update the hidden input field with the selected value
-        const hiddenInput = document.getElementById('adSpend');
-        hiddenInput.value = value;
-
-        // Send the selected value to Google Sheets or log it
-        sendDataToSheet({ sessionId, adSpend: value });  // Use 'adSpend' as the key directly
-        } else if (type === 'multi') {
-            // For multi-select boxes like Best Day and Time
-            target.classList.toggle('selected');
-            const selectedBoxes = target.parentElement.querySelectorAll('.multi-select.selected');
-            const values = Array.from(selectedBoxes).map(box => box.getAttribute('data-value'));
-            target.parentElement.nextElementSibling.value = values.join(', '); // Update hidden input
-            const parentId = target.parentElement.id;
-            sendDataToSheet({ sessionId, [parentId]: values.join(', ') });
-        }
     }
 
     function updateFormSteps(newStepIndex) {
@@ -155,14 +127,33 @@ function handleSelection(event, type) {
         }
     }
 
-    // Update the event listeners for each step
+    function handleSelection(event, type) {
+        const target = event.currentTarget;
+        if (type === 'single') {
+            const allSelectBoxes = target.parentElement.querySelectorAll('.select-box');
+            allSelectBoxes.forEach(box => box.classList.remove('selected'));
+            target.classList.add('selected');
+            const value = target.getAttribute('data-value');
+            target.parentElement.nextElementSibling.value = value;
+            sendDataToSheet({ sessionId, [target.parentElement.previousElementSibling.textContent.trim()]: value });
+        } else if (type === 'multi') {
+            target.classList.toggle('selected');
+            const selectedBoxes = target.parentElement.querySelectorAll('.multi-select.selected');
+            const values = Array.from(selectedBoxes).map(box => box.getAttribute('data-value'));
+            target.parentElement.nextElementSibling.value = values.join(', ');
+            const parentId = target.parentElement.id;
+            sendDataToSheet({ sessionId, [parentId]: values.join(', ') });
+        }
+    }
+
+    updateBackButtonState(currentStep);
+
     nextButtons.forEach(button => {
         button.addEventListener("click", () => {
             const currentFormStep = formSteps[currentStep];
             const inputs = currentFormStep.querySelectorAll('input, select');
             let valid = true;
 
-            // Ensure that all required fields are filled
             inputs.forEach(input => {
                 if (!input.checkValidity()) {
                     valid = false;
@@ -180,55 +171,39 @@ function handleSelection(event, type) {
 
                 const nextStepIndex = currentStep + 1;
 
-                // Send data for each step but don't redirect
                 switch (nextStepIndex) {
-                    case 1: // Step 2: Phone Number
+                    case 1:
                         sendDataToSheet({ sessionId, email: formData.email });
                         break;
-                    case 2: // Step 3: Full Name
+                    case 2:
                         sendDataToSheet({ sessionId, phone: formData.phone });
                         break;
-                    case 3: // Step 4: Company Website
+                    case 3:
+                        sendDataToSheet({ sessionId, name: formData.name });
+                        break;
+                    case 4:
                         sendDataToSheet({ sessionId, website: formData.website });
                         break;
-                    case 4: // Step 5: Ad Spend
-                        sendDataToSheet({ sessionId, adSpend: formData.adSpend });
-                        break;
-                    case 5: // Step 6: Best Call Day
-                        sendDataToSheet({ sessionId, callDaySelected: formData.callDaySelected });
-                        break;
-                    case 6: // Step 7: Best Call Time
-                        sendDataToSheet({ sessionId, callTimeSelected: formData.callTimeSelected });
-                        break;
-                    case 7: // Step 8: State
+                    case 7:
                         sendDataToSheet({ sessionId, state: formData.state });
                         break;
                     default:
                         break;
                 }
 
-                // Only move to the next step if all fields are filled
-                if (valid) {
-                    updateFormSteps(nextStepIndex);
-                }
+                updateFormSteps(nextStepIndex);
             }
         });
     });
 
-    // Attach event listeners to single-select boxes (Step 5: Ad Spend)
     const selectBoxes = document.querySelectorAll('.select-box');
     selectBoxes.forEach(box => {
-        box.addEventListener('click', (e) => {
-            handleSelection(e, 'single');
-        });
+        box.addEventListener('click', (e) => handleSelection(e, 'single'));
     });
 
-    // Attach event listeners to multi-select boxes (Steps 6 & 7)
     const multiSelectBoxes = document.querySelectorAll('.multi-select');
     multiSelectBoxes.forEach(box => {
-        box.addEventListener('click', (e) => {
-            handleSelection(e, 'multi');
-        });
+        box.addEventListener('click', (e) => handleSelection(e, 'multi'));
     });
 
     backBtn.addEventListener("click", () => {
@@ -251,18 +226,8 @@ function handleSelection(event, type) {
             callTime: formData.callTimeSelected,
             state: formData.state
         };
-
-        // Ensure no field is left blank
-        if (Object.values(finalData).every(field => field)) {
-            sendDataToSheet(finalData);
-            form.reset();
-            updateFormSteps(8);  // Final step to show success message
-        } else {
-            // Redirect user back to the first blank field
-            const firstBlankStep = Object.keys(finalData).findIndex(key => !finalData[key]);
-            updateFormSteps(firstBlankStep);
-            alert("Please fill out all required fields.");
-        }
+        sendDataToSheet(finalData);
+        form.reset();
+        updateFormSteps(8);  // Final step to show success message
     });
 });
-
