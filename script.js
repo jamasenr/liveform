@@ -56,9 +56,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Define the handleSelection function that handles single and multi-select clicks
     
-    function handleSelection(event, type) {
+function handleSelection(event, type) {
     const target = event.currentTarget;
-
     if (type === 'single') {
         // Deselect all other select boxes
         const allSelectBoxes = target.parentElement.querySelectorAll('.select-box');
