@@ -132,7 +132,10 @@ document.addEventListener("DOMContentLoaded", () => {
             target.classList.add('selected');
             const value = target.getAttribute('data-value');
             target.parentElement.nextElementSibling.value = value;
-            sendDataToSheet({ sessionId, [target.parentElement.previousElementSibling.textContent.trim()]: value });
+            const previousSibling = target.parentElement.previousElementSibling;
+            const label = previousSibling ? previousSibling.textContent.trim() : 'defaultLabel';
+            sendDataToSheet({ sessionId, [label]: value });
+
         } else if (type === 'multi') {
             target.classList.toggle('selected');
             const selectedBoxes = target.parentElement.querySelectorAll('.multi-select.selected');
