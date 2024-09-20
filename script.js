@@ -47,14 +47,11 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => response.json())
         .then(result => {
             if (result.status === 'success') {
-                console.log('Data successfully sent to Google Sheets');
                 updateFormSteps(8);  // Final success step
             } else {
-                console.error('Error in sending data to Google Sheets:', result.message);
             }
         })
         .catch(error => {
-            console.error('Error:', error);
         });
     }
 
