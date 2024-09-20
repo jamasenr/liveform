@@ -58,13 +58,21 @@ document.addEventListener("DOMContentLoaded", () => {
     function handleSelection(event, type) {
         const target = event.currentTarget;
         if (type === 'single') {
-            // For single-select boxes like Ad Spend
-            const allSelectBoxes = target.parentElement.querySelectorAll('.select-box');
-            allSelectBoxes.forEach(box => box.classList.remove('selected'));
-            target.classList.add('selected');
-            const value = target.getAttribute('data-value');
-            target.parentElement.nextElementSibling.value = value; // Update hidden input
-            sendDataToSheet({ sessionId, [target.parentElement.previousElementSibling.textContent.trim()]: value });
+        // Deselect all other select boxes
+        const allSelectBoxes = target.parentElement.querySelectorAll('.select-box');
+        allSelectBoxes.forEach(box => box.classList.remove('selected'));
+
+        // Mark the clicked one as selected
+        target.classList.add('selected');
+
+        // Get the value of the selected option
+        const value = target.getAttribute('data-value');
+
+        // Update the hidden input field with the selected value
+        target.parentElement.nextElementSibling.value = value;  // Assuming the hidden input is right after the select boxes
+
+        // Optional: Send the selected value to Google Sheets or log it
+        sendDataToSheet({ sessionId, adSpend: value });  // Adjust the key accordingly
         } else if (type === 'multi') {
             // For multi-select boxes like Best Day and Time
             target.classList.toggle('selected');
@@ -255,3 +263,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+console.log('Selected Ad Spend:', value);
+console.log('Hidden input value:', target.parentElement.nextElementSibling.value);
+
