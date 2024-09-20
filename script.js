@@ -38,7 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const url = 'https://script.google.com/macros/s/AKfycbypHcLegjJjGkv6lLmE__7GJIaEC4skN1dPKniJ5Z7tIkpHcKL057odfl_esLFQiM-T/exec';
         fetch(url, {
             method: 'POST',
-            mode: 'no-cors',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -140,15 +139,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Get the value from the selected box's data-value attribute
             const value = target.getAttribute('data-value');
+
             // Update the hidden input field with the selected value
-            target.parentElement.nextElementSibling.value = value;
+            const hiddenInput = target.parentElement.querySelector('input[type="hidden"]');
+            hiddenInput.value = value;
 
-            // Handle label assignment for data submission
-            const previousSibling = target.parentElement.previousElementSibling;
-            const label = previousSibling ? previousSibling.textContent.trim() : 'defaultLabel';
+            // Get the input's name attribute to use as the key
+            const inputName = hiddenInput.name;
 
-            // Send data to Google Sheet or any external system
-            sendDataToSheet({ sessionId, [label]: value });
+            // Send data to Google Sheet or any external system with the correct key
+            sendDataToSheet({ sessionId, [inputName]: value });
         } else if (type === 'multi') {
             target.classList.toggle('selected');
             const selectedBoxes = target.parentElement.querySelectorAll('.multi-select.selected');
@@ -205,8 +205,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     case 4:
                         sendDataToSheet({ sessionId, website: formData.website });
                         break;
+                    case 5:
+                        sendDataToSheet({ sessionId, adSpend: formData.adSpend });
+                        break;
+                    case 6:
+                        sendDataToSheet({ sessionId, callDay: formData.callDaySelected });
+                        break;
                     case 7:
-                        sendDataToSheet({ sessionId, state: formData.state });
+                        sendDataToSheet({ sessionId, callTime: formData.callTimeSelected });
+                        break;
+                    case 8:
+                        // Do not send state here; handle it on form submission
                         break;
                     default:
                         break;
@@ -235,7 +244,7 @@ document.addEventListener("DOMContentLoaded", () => {
             adSpend: document.getElementById('adSpend').value,
             callDay: document.getElementById('callDaySelected').value,
             callTime: document.getElementById('callTimeSelected').value,
-            state: formData.state
+            state: document.getElementById('state').value  // Updated line
         };
         sendDataToSheet(finalData);
         form.reset();
