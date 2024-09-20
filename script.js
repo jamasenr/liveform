@@ -123,6 +123,28 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Handle selection logic for single and multi-select boxes
+    function handleSelection(event, type) {
+        const target = event.currentTarget;
+        if (type === 'single') {
+            // For single-select boxes like Ad Spend
+            const allSelectBoxes = target.parentElement.querySelectorAll('.select-box');
+            allSelectBoxes.forEach(box => box.classList.remove('selected'));
+            target.classList.add('selected');
+            const value = target.getAttribute('data-value');
+            target.parentElement.nextElementSibling.value = value; // Update hidden input
+            sendDataToSheet({ sessionId, [target.parentElement.previousElementSibling.textContent.trim()]: value });
+        } else if (type === 'multi') {
+            // For multi-select boxes like Best Day and Time
+            target.classList.toggle('selected');
+            const selectedBoxes = target.parentElement.querySelectorAll('.multi-select.selected');
+            const values = Array.from(selectedBoxes).map(box => box.getAttribute('data-value'));
+            target.parentElement.nextElementSibling.value = values.join(', '); // Update hidden input
+            const parentId = target.parentElement.id;
+            sendDataToSheet({ sessionId, [parentId]: values.join(', ') });
+        }
+    }
+
     // Update the event listeners for each step
     nextButtons.forEach(button => {
         button.addEventListener("click", () => {
@@ -177,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Event listener for single select (Step 5: Ad Spend)
+    // Attach event listeners to single-select boxes (Step 5: Ad Spend)
     const selectBoxes = document.querySelectorAll('.select-box');
     selectBoxes.forEach(box => {
         box.addEventListener('click', (e) => {
@@ -185,34 +207,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Event listener for multi select (Step 6 & 7: Best Day and Best Time to Call)
+    // Attach event listeners to multi-select boxes (Steps 6 & 7)
     const multiSelectBoxes = document.querySelectorAll('.multi-select');
     multiSelectBoxes.forEach(box => {
         box.addEventListener('click', (e) => {
             handleSelection(e, 'multi');
         });
     });
-
-    function handleSelection(event, type) {
-        const target = event.currentTarget;
-        if (type === 'single') {
-            // For single-select boxes like Ad Spend
-            const allSelectBoxes = target.parentElement.querySelectorAll('.select-box');
-            allSelectBoxes.forEach(box => box.classList.remove('selected'));
-            target.classList.add('selected');
-            const value = target.getAttribute('data-value');
-            target.parentElement.nextElementSibling.value = value;
-            sendDataToSheet({ sessionId, [target.parentElement.previousElementSibling.textContent.trim()]: value });
-        } else if (type === 'multi') {
-            // For multi-select boxes like Best Day and Time
-            target.classList.toggle('selected');
-            const selectedBoxes = target.parentElement.querySelectorAll('.multi-select.selected');
-            const values = Array.from(selectedBoxes).map(box => box.getAttribute('data-value'));
-            target.parentElement.nextElementSibling.value = values.join(', ');
-            const parentId = target.parentElement.id;
-            sendDataToSheet({ sessionId, [parentId]: values.join(', ') });
-        }
-    }
 
     backBtn.addEventListener("click", () => {
         if (currentStep > 0) {
