@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const backBtn = document.getElementById("back-btn");
     const progress = document.querySelector(".progress");
     let currentStep = 0;
-    const formData = {}; 
+    const formData = {};
 
     const h1 = document.querySelector("h1");
     const p = document.querySelector("p");
@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "Phone Number?", // Step 2
         "Full Name?", // Step 3
         "Company Website?", // Step 4
-        "Select your ad spend:", // Step 5
+        "How Much Do You Spend on Ads Today?", // Step 5
         "Which day of the week is best to call you?", // Step 6
         "What time of day is best to call you?", // Step 7
         "What state are you in?" // Step 8
@@ -38,19 +38,22 @@ document.addEventListener("DOMContentLoaded", () => {
         const url = 'https://script.google.com/macros/s/AKfycbypHcLegjJjGkv6lLmE__7GJIaEC4skN1dPKniJ5Z7tIkpHcKL057odfl_esLFQiM-T/exec';
         fetch(url, {
             method: 'POST',
-            mode: 'no-cors', // Necessary due to CORS limitations with Google Apps Script
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
         })
-        .then(() => {
-            // Since the response is opaque, we can't confirm success
-            console.log('Data sent successfully:', data);
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                updateFormSteps(formSteps.length - 1);  // Final success step
+            } else {
+                alert('Submission failed. Please try again.');
+            }
         })
         .catch(error => {
-            console.error('Error sending data:', error);
-            alert('An error occurred while sending your data. Please try again.');
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
         });
     }
 
@@ -127,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const target = event.currentTarget;
 
         if (type === 'single') {
-            // Remove 'selected' class from all select boxes
+            // Find all select boxes and remove the 'selected' class
             const allSelectBoxes = target.parentElement.querySelectorAll('.select-box');
             allSelectBoxes.forEach(box => box.classList.remove('selected'));
 
@@ -144,39 +147,24 @@ document.addEventListener("DOMContentLoaded", () => {
             // Get the input's name attribute to use as the key
             const inputName = hiddenInput.name;
 
-            // Update formData
-            formData[inputName] = value;
-
             // Send data to Google Sheet or any external system with the correct key
             sendDataToSheet({ sessionId, [inputName]: value });
         } else if (type === 'multi') {
-            // Toggle 'selected' class
             target.classList.toggle('selected');
-
-            // Get all selected values
             const selectedBoxes = target.parentElement.querySelectorAll('.multi-select.selected');
             const values = Array.from(selectedBoxes).map(box => box.getAttribute('data-value'));
-
-            // Update the hidden input field with the selected values
             target.parentElement.nextElementSibling.value = values.join(', ');
-
-            // Get the parent ID to use as the key
             const parentId = target.parentElement.id;
-
-            // Update formData
-            formData[parentId] = values.join(', ');
-
-            // Send data to Google Sheet or any external system
             sendDataToSheet({ sessionId, [parentId]: values.join(', ') });
         }
     }
 
-    // Attach event listeners to all .select-box elements (single select)
+    // Attach event listeners to all .select-box elements
     document.querySelectorAll('.select-box').forEach(box => {
         box.addEventListener('click', (event) => handleSelection(event, 'single'));
     });
 
-    // Attach event listeners to all .multi-select elements (multi select)
+    // Attach event listeners to all .multi-select elements
     document.querySelectorAll('.multi-select').forEach(box => {
         box.addEventListener('click', (event) => handleSelection(event, 'multi'));
     });
@@ -197,15 +185,43 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             if (valid) {
+                const formElements = currentFormStep.querySelectorAll('input, select');
+                formElements.forEach(input => {
+                    formData[input.name] = input.value;
+                });
+
                 const nextStepIndex = currentStep + 1;
 
-                // Update form titles and proceed to next step
+                switch (nextStepIndex) {
+                    case 1:
+                        sendDataToSheet({ sessionId, email: formData.email });
+                        break;
+                    case 2:
+                        sendDataToSheet({ sessionId, phone: formData.phone });
+                        break;
+                    case 3:
+                        sendDataToSheet({ sessionId, name: formData.name });
+                        break;
+                    case 4:
+                        sendDataToSheet({ sessionId, website: formData.website });
+                        break;
+                    case 5:
+                        sendDataToSheet({ sessionId, adSpend: formData.adSpend });
+                        break;
+                    case 6:
+                        sendDataToSheet({ sessionId, callDay: formData.callDaySelected });
+                        break;
+                    case 7:
+                        sendDataToSheet({ sessionId, callTime: formData.callTimeSelected });
+                        break;
+                    case 8:
+                        // Do not send state here; handle it on form submission
+                        break;
+                    default:
+                        break;
+                }
+
                 updateFormSteps(nextStepIndex);
-
-                // Increment step
-                currentStep = nextStepIndex;
-
-                updateBackButtonState(currentStep);
             }
         });
     });
@@ -214,27 +230,23 @@ document.addEventListener("DOMContentLoaded", () => {
         if (currentStep > 0) {
             const previousStepIndex = currentStep - 1;
             updateFormSteps(previousStepIndex);
-            currentStep = previousStepIndex;
-            updateBackButtonState(currentStep);
         }
     });
 
     form.addEventListener('submit', (e) => {
         e.preventDefault();
-
-        // Collect all form data
         const finalData = {
             sessionId,
-            ...formData,
-            state: document.getElementById('state').value // Directly get the state value
+            email: formData.email,
+            phone: formData.phone,
+            name: formData.name,
+            website: formData.website,
+            adSpend: document.getElementById('adSpend').value,
+            callDay: document.getElementById('callDaySelected').value,
+            callTime: document.getElementById('callTimeSelected').value,
+            state: document.getElementById('state').value  // Updated line
         };
-
-        console.log('Submitting final data:', finalData); // Debugging
-
-        // Send all data at once
         sendDataToSheet(finalData);
-
-        // Reset the form and show success message
         form.reset();
         updateFormSteps(formSteps.length - 1);  // Final step to show success message
     });
