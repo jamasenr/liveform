@@ -48,12 +48,12 @@ document.addEventListener("DOMContentLoaded", () => {
             if (result.status === 'success') {
                 updateFormSteps(formSteps.length - 1);  // Final success step
             } else {
-                alert('Submission failed. Please try again.');
+               
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred. Please try again.');
+            
         });
     }
 
