@@ -125,26 +125,53 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function handleSelection(event, type) {
-        const target = event.currentTarget;
-        if (type === 'single') {
-            const allSelectBoxes = target.parentElement.querySelectorAll('.select-box');
-            allSelectBoxes.forEach(box => box.classList.remove('selected'));
-            target.classList.add('selected');
-            const value = target.getAttribute('data-value');
-            target.parentElement.nextElementSibling.value = value;
-            const previousSibling = target.parentElement.previousElementSibling;
-            const label = previousSibling ? previousSibling.textContent.trim() : 'defaultLabel';
-            sendDataToSheet({ sessionId, [label]: value });
+    const target = event.currentTarget;
 
-        } else if (type === 'multi') {
-            target.classList.toggle('selected');
-            const selectedBoxes = target.parentElement.querySelectorAll('.multi-select.selected');
-            const values = Array.from(selectedBoxes).map(box => box.getAttribute('data-value'));
-            target.parentElement.nextElementSibling.value = values.join(', ');
-            const parentId = target.parentElement.id;
-            sendDataToSheet({ sessionId, [parentId]: values.join(', ') });
-        }
+    if (type === 'single') {
+        // Find all select boxes and remove the 'selected' class
+        const allSelectBoxes = target.parentElement.querySelectorAll('.select-box');
+        allSelectBoxes.forEach(box => box.classList.remove('selected'));
+
+        // Add 'selected' class to the clicked box
+        target.classList.add('selected');
+
+        // Get the value from the selected box's data-value attribute
+        const value = target.getAttribute('data-value');
+
+        // Update the hidden input field with the selected value
+        target.parentElement.nextElementSibling.value = value;
+
+        // Handle label assignment for data submission (optional depending on your need)
+        const previousSibling = target.parentElement.previousElementSibling;
+        const label = previousSibling ? previousSibling.textContent.trim() : 'defaultLabel';
+
+        // Send data to Google Sheet or any external system
+        sendDataToSheet({ sessionId, [label]: value });
+    } else if (type === 'multi') {
+        // Handle multi-select
+        target.classList.toggle('selected');
+
+        // Collect all selected boxes' data-value attributes
+        const selectedBoxes = target.parentElement.querySelectorAll('.multi-select.selected');
+        const values = Array.from(selectedBoxes).map(box => box.getAttribute('data-value'));
+
+        // Update the hidden input with the joined values
+        target.parentElement.nextElementSibling.value = values.join(', ');
+
+        // Optionally use the parent element's ID for multi-select (adjust to your needs)
+        const parentId = target.parentElement.id;
+        sendDataToSheet({ sessionId, [parentId]: values.join(', ') });
     }
+}
+
+// Attach event listeners to all .select-box elements
+document.querySelectorAll('.select-box').forEach(box => {
+    box.addEventListener('click', (event) => handleSelection(event, 'single'));
+});
+
+document.querySelectorAll('.multi-select').forEach(box => {
+    box.addEventListener('click', (event) => handleSelection(event, 'multi'));
+});
 
     updateBackButtonState(currentStep);
 
