@@ -179,11 +179,17 @@ document.addEventListener("DOMContentLoaded", () => {
                         sendDataToSheet({ sessionId, phone: formData.phone });
                         break;
                     case 3: // Step 4: Company Website
-                        sendDataToSheet({ sessionId, name: formData.name });
+                        sendDataToSheet({ sessionId, name: formData.website });
                         break;
                     case 4: // Step 5: Ad Spend
-                        sendDataToSheet({ sessionId, website: formData.website });
+                        sendDataToSheet({ sessionId, website: formData.adSpend });
                         break;
+                    case 5: // Step 6: bestCall
+                        sendDataToSheet({ sessionId, website: formData.callDaySelected });
+                        break;
+                    case 6: // Step 7: bestCall
+                        sendDataToSheet({ sessionId, website: formData.callTimeSelected });
+                        break;    
                     case 7: // Step 8: State
                         sendDataToSheet({ sessionId, state: formData.state });
                         break;
