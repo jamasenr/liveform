@@ -55,9 +55,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Define the handleSelection function that handles single and multi-select clicks
+    
     function handleSelection(event, type) {
-        const target = event.currentTarget;
-        function handleSelection(event, type) {
     const target = event.currentTarget;
 
     if (type === 'single') {
