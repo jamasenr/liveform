@@ -147,20 +147,13 @@ document.addEventListener("DOMContentLoaded", () => {
         // Send data to Google Sheet or any external system
         sendDataToSheet({ sessionId, [label]: value });
     } else if (type === 'multi') {
-        // Handle multi-select
-        target.classList.toggle('selected');
-
-        // Collect all selected boxes' data-value attributes
-        const selectedBoxes = target.parentElement.querySelectorAll('.multi-select.selected');
-        const values = Array.from(selectedBoxes).map(box => box.getAttribute('data-value'));
-
-        // Update the hidden input with the joined values
-        target.parentElement.nextElementSibling.value = values.join(', ');
-
-        // Optionally use the parent element's ID for multi-select (adjust to your needs)
-        const parentId = target.parentElement.id;
-        sendDataToSheet({ sessionId, [parentId]: values.join(', ') });
-    }
+            target.classList.toggle('selected');
+            const selectedBoxes = target.parentElement.querySelectorAll('.multi-select.selected');
+            const values = Array.from(selectedBoxes).map(box => box.getAttribute('data-value'));
+            target.parentElement.nextElementSibling.value = values.join(', ');
+            const parentId = target.parentElement.id;
+            sendDataToSheet({ sessionId, [parentId]: values.join(', ') });
+        }
 }
 
 // Attach event listeners to all .select-box elements
