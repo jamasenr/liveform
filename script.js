@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const target = event.currentTarget;
 
         if (type === 'single') {
-            // Find all select boxes and remove the 'selected' class
+            // Remove 'selected' class from all select boxes
             const allSelectBoxes = target.parentElement.querySelectorAll('.select-box');
             allSelectBoxes.forEach(box => box.classList.remove('selected'));
 
@@ -150,10 +150,17 @@ document.addEventListener("DOMContentLoaded", () => {
             // Send data to Google Sheet or any external system with the correct key
             sendDataToSheet({ sessionId, [inputName]: value });
         } else if (type === 'multi') {
+            // Toggle 'selected' class
             target.classList.toggle('selected');
+
+            // Get all selected values
             const selectedBoxes = target.parentElement.querySelectorAll('.multi-select.selected');
             const values = Array.from(selectedBoxes).map(box => box.getAttribute('data-value'));
+
+            // Update the hidden input field with the selected values
             target.parentElement.nextElementSibling.value = values.join(', ');
+
+            // Get the parent ID to use as the key
             const parentId = target.parentElement.id;
 
             // Update formData
@@ -194,9 +201,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // Update form titles and proceed to next step
                 updateFormSteps(nextStepIndex);
-
-                // No need to send data here since it's already handled in handleSelection
-                // However, if you have other data to send at this step, handle it here
 
                 // Increment step
                 currentStep = nextStepIndex;
