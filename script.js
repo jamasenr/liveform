@@ -57,7 +57,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Define the handleSelection function that handles single and multi-select clicks
     function handleSelection(event, type) {
         const target = event.currentTarget;
-        if (type === 'single') {
+        function handleSelection(event, type) {
+    const target = event.currentTarget;
+
+    if (type === 'single') {
         // Deselect all other select boxes
         const allSelectBoxes = target.parentElement.querySelectorAll('.select-box');
         allSelectBoxes.forEach(box => box.classList.remove('selected'));
@@ -69,10 +72,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const value = target.getAttribute('data-value');
 
         // Update the hidden input field with the selected value
-        target.parentElement.nextElementSibling.value = value;  // Assuming the hidden input is right after the select boxes
+        const hiddenInput = document.getElementById('adSpend');
+        hiddenInput.value = value;
 
-        // Optional: Send the selected value to Google Sheets or log it
-        sendDataToSheet({ sessionId, adSpend: value });  // Adjust the key accordingly
+        // Send the selected value to Google Sheets or log it
+        sendDataToSheet({ sessionId, adSpend: value });  // Use 'adSpend' as the key directly
         } else if (type === 'multi') {
             // For multi-select boxes like Best Day and Time
             target.classList.toggle('selected');
