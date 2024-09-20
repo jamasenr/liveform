@@ -47,11 +47,14 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => response.json())
         .then(result => {
             if (result.status === 'success') {
-                updateFormSteps(8);  // Final success step
+                updateFormSteps(formSteps.length - 1);  // Final success step
             } else {
+                alert('Submission failed. Please try again.');
             }
         })
         .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
         });
     }
 
@@ -125,28 +128,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function handleSelection(event, type) {
-    const target = event.currentTarget;
+        const target = event.currentTarget;
 
-    if (type === 'single') {
-        // Find all select boxes and remove the 'selected' class
-        const allSelectBoxes = target.parentElement.querySelectorAll('.select-box');
-        allSelectBoxes.forEach(box => box.classList.remove('selected'));
+        if (type === 'single') {
+            // Find all select boxes and remove the 'selected' class
+            const allSelectBoxes = target.parentElement.querySelectorAll('.select-box');
+            allSelectBoxes.forEach(box => box.classList.remove('selected'));
 
-        // Add 'selected' class to the clicked box
-        target.classList.add('selected');
+            // Add 'selected' class to the clicked box
+            target.classList.add('selected');
 
-        // Get the value from the selected box's data-value attribute
-        const value = target.getAttribute('data-value');
-        // Update the hidden input field with the selected value
-        target.parentElement.nextElementSibling.value = value;
+            // Get the value from the selected box's data-value attribute
+            const value = target.getAttribute('data-value');
+            // Update the hidden input field with the selected value
+            target.parentElement.nextElementSibling.value = value;
 
-        // Handle label assignment for data submission (optional depending on your need)
-        const previousSibling = target.parentElement.previousElementSibling;
-        const label = previousSibling ? previousSibling.textContent.trim() : 'defaultLabel';
+            // Handle label assignment for data submission
+            const previousSibling = target.parentElement.previousElementSibling;
+            const label = previousSibling ? previousSibling.textContent.trim() : 'defaultLabel';
 
-        // Send data to Google Sheet or any external system
-        sendDataToSheet({ sessionId, [label]: value });
-    } else if (type === 'multi') {
+            // Send data to Google Sheet or any external system
+            sendDataToSheet({ sessionId, [label]: value });
+        } else if (type === 'multi') {
             target.classList.toggle('selected');
             const selectedBoxes = target.parentElement.querySelectorAll('.multi-select.selected');
             const values = Array.from(selectedBoxes).map(box => box.getAttribute('data-value'));
@@ -154,16 +157,17 @@ document.addEventListener("DOMContentLoaded", () => {
             const parentId = target.parentElement.id;
             sendDataToSheet({ sessionId, [parentId]: values.join(', ') });
         }
-}
+    }
 
-// Attach event listeners to all .select-box elements
-document.querySelectorAll('.select-box').forEach(box => {
-    box.addEventListener('click', (event) => handleSelection(event, 'single'));
-});
+    // Attach event listeners to all .select-box elements
+    document.querySelectorAll('.select-box').forEach(box => {
+        box.addEventListener('click', (event) => handleSelection(event, 'single'));
+    });
 
-document.querySelectorAll('.multi-select').forEach(box => {
-    box.addEventListener('click', (event) => handleSelection(event, 'multi'));
-});
+    // Attach event listeners to all .multi-select elements
+    document.querySelectorAll('.multi-select').forEach(box => {
+        box.addEventListener('click', (event) => handleSelection(event, 'multi'));
+    });
 
     updateBackButtonState(currentStep);
 
@@ -183,9 +187,7 @@ document.querySelectorAll('.multi-select').forEach(box => {
             if (valid) {
                 const formElements = currentFormStep.querySelectorAll('input, select');
                 formElements.forEach(input => {
-                    if (input.type !== 'hidden') {
-                        formData[input.name] = input.value;
-                    }
+                    formData[input.name] = input.value;
                 });
 
                 const nextStepIndex = currentStep + 1;
@@ -215,16 +217,6 @@ document.querySelectorAll('.multi-select').forEach(box => {
         });
     });
 
-    const selectBoxes = document.querySelectorAll('.select-box');
-    selectBoxes.forEach(box => {
-        box.addEventListener('click', (e) => handleSelection(e, 'single'));
-    });
-
-    const multiSelectBoxes = document.querySelectorAll('.multi-select');
-    multiSelectBoxes.forEach(box => {
-        box.addEventListener('click', (e) => handleSelection(e, 'multi'));
-    });
-
     backBtn.addEventListener("click", () => {
         if (currentStep > 0) {
             const previousStepIndex = currentStep - 1;
@@ -240,13 +232,13 @@ document.querySelectorAll('.multi-select').forEach(box => {
             phone: formData.phone,
             name: formData.name,
             website: formData.website,
-            adSpend: formData.adSpend,
-            callDay: formData.callDaySelected,
-            callTime: formData.callTimeSelected,
+            adSpend: document.getElementById('adSpend').value,
+            callDay: document.getElementById('callDaySelected').value,
+            callTime: document.getElementById('callTimeSelected').value,
             state: formData.state
         };
         sendDataToSheet(finalData);
         form.reset();
-        updateFormSteps(8);  // Final step to show success message
+        updateFormSteps(formSteps.length - 1);  // Final step to show success message
     });
 });
