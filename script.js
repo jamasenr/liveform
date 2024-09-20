@@ -54,6 +54,28 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Define the handleSelection function that handles single and multi-select clicks
+    function handleSelection(event, type) {
+        const target = event.currentTarget;
+        if (type === 'single') {
+            // For single-select boxes like Ad Spend
+            const allSelectBoxes = target.parentElement.querySelectorAll('.select-box');
+            allSelectBoxes.forEach(box => box.classList.remove('selected'));
+            target.classList.add('selected');
+            const value = target.getAttribute('data-value');
+            target.parentElement.nextElementSibling.value = value; // Update hidden input
+            sendDataToSheet({ sessionId, [target.parentElement.previousElementSibling.textContent.trim()]: value });
+        } else if (type === 'multi') {
+            // For multi-select boxes like Best Day and Time
+            target.classList.toggle('selected');
+            const selectedBoxes = target.parentElement.querySelectorAll('.multi-select.selected');
+            const values = Array.from(selectedBoxes).map(box => box.getAttribute('data-value'));
+            target.parentElement.nextElementSibling.value = values.join(', '); // Update hidden input
+            const parentId = target.parentElement.id;
+            sendDataToSheet({ sessionId, [parentId]: values.join(', ') });
+        }
+    }
+
     function updateFormSteps(newStepIndex) {
         if (currentStep === 0) {
             h1.classList.add("slide-out-left");
@@ -120,28 +142,6 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             backBtn.disabled = true;
             backBtn.classList.remove("enabled");
-        }
-    }
-
-    // Handle selection logic for single and multi-select boxes
-    function handleSelection(event, type) {
-        const target = event.currentTarget;
-        if (type === 'single') {
-            // For single-select boxes like Ad Spend
-            const allSelectBoxes = target.parentElement.querySelectorAll('.select-box');
-            allSelectBoxes.forEach(box => box.classList.remove('selected'));
-            target.classList.add('selected');
-            const value = target.getAttribute('data-value');
-            target.parentElement.nextElementSibling.value = value; // Update hidden input
-            sendDataToSheet({ sessionId, [target.parentElement.previousElementSibling.textContent.trim()]: value });
-        } else if (type === 'multi') {
-            // For multi-select boxes like Best Day and Time
-            target.classList.toggle('selected');
-            const selectedBoxes = target.parentElement.querySelectorAll('.multi-select.selected');
-            const values = Array.from(selectedBoxes).map(box => box.getAttribute('data-value'));
-            target.parentElement.nextElementSibling.value = values.join(', '); // Update hidden input
-            const parentId = target.parentElement.id;
-            sendDataToSheet({ sessionId, [parentId]: values.join(', ') });
         }
     }
 
