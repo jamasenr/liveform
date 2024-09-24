@@ -240,6 +240,6 @@ document.addEventListener("DOMContentLoaded", () => {
         sendDataToSheet(finalData);
         form.reset();
         updateFormSteps(formSteps.length - 1);  // Final step to show success message
-        window.parent.location.href = "www.loopgenius.com/agency-client-success";
+        window.parent.location.href = "https://www.loopgenius.com/agency-client-success";
     });
 });
